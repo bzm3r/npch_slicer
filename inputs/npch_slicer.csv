@@ -1,0 +1,51 @@
+description,start,end
+Blank,9,10
+Human-Skyborn,36,37
+Human-Streetborn,38,39
+Human-Aristocrat,40,41
+Human-Academic,42,43
+Jotunn,44,45
+Nix,46,47
+Vesp,48,49
+Fae,50,51
+Half-Fae,52,53
+Archon,54,55
+Tsuku,56,57
+Homunculi,58,59
+Gunslinger,62,64
+Sharpshooter,64,66
+Wardog,66,68
+Calibrist,68,70
+Swordfiend,70,72
+Martial Artist,72,74
+Champion,74,76
+Brute,76,78
+Shadow,78,80
+Dynamic Duo,80,82
+Fortress,82,84
+Bodyguard,84,86
+Ranger,88,90
+Freerunner,90,92
+Pilot,92,94
+Strategist,94,96
+Tinker,96,100
+Engineer,100,102
+Seeker,102,106
+Infiltrator,106,108
+Con-artist,108,112
+Liaison,112,116
+Paragon,116,120
+Chronographer,123,125
+Mender,125,127
+Changeling,127,129
+Maelstrom,129,131
+Conduit,131,133
+Impostor,136,138
+Jinx,138,140
+Predator,140,142
+Macabre,142,144
+Swarm Master,144,146
+Crescent Staccato,149,151
+A390# Spider Drone,151,153
+Goliath Pangolin,153,155
+Hearthoak Seed,155,157
