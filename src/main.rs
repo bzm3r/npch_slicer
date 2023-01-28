@@ -161,14 +161,16 @@ fn shrink(pdf_name: &str) {
     let pre_shrink_size = input_path.metadata().unwrap().len() as f32;
 
     let output_path = PathBuf::from(format!("./outputs/optimized/{pdf_name}.pdf"));
-    let image_resolution = 60;
+    // let image_resolution = 1200;
     Command::new("gswin64")
         .arg("-dBATCH")
         .arg("-dNOPAUSE")
+        .arg("-dNOPROMPT")
         .arg("-q")
-        .arg("-dCompatibilityLevel=1.4")
-        .arg("-dPDFSETTINGS=/screen")
-        .arg(format!("-r{image_resolution}"))
+        .arg("-dCompatibilityLevel=1.7")
+        // .arg("-sColorConversionStrategy=Gray")
+        // .arg("-d")
+        // .arg(format!("-r{image_resolution}"))
         .arg("-sDEVICE=pdfwrite")
         .arg(format!("-sOutputFile={}", output_path.display()))
         .arg(&input_path)
