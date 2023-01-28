@@ -13,4 +13,5 @@ Cargo.lock
 /target
 
 # output of the pdf slicing process
-/outputs/*.pdf
+/outputs/unoptimized/*.pdf
+/outputs/optimized/*.pdf

@@ -2,8 +2,9 @@ use lopdf::Document;
 use serde::Deserialize;
 use std::cmp::Ordering;
 use std::collections::BTreeSet;
-use std::error::Error;
 use std::ops::Sub;
+use std::path::PathBuf;
+use std::process::Command;
 use std::slice::Iter;
 use thiserror::Error;
 
@@ -92,25 +93,28 @@ impl SliceRequests {
     }
 }
 
-fn slice() -> Result<SliceRequests, Box<dyn Error>> {
+fn slice() -> SliceRequests {
     let mut reader = csv::ReaderBuilder::new()
         .has_headers(true)
-        .from_path("./inputs/npch_slicer.csv")?;
+        .from_path("./inputs/npch_slicer.csv")
+        .unwrap();
 
     let raw_slice_requests = reader
         .deserialize()
-        .collect::<Result<Vec<RawSliceRequest>, _>>()?;
+        .collect::<Result<Vec<RawSliceRequest>, _>>()
+        .unwrap();
 
     let individual_slice_requests = raw_slice_requests
         .into_iter()
         .map(SliceRequest::try_from)
-        .collect::<Result<Vec<SliceRequest>, _>>()?;
+        .collect::<Result<Vec<SliceRequest>, _>>()
+        .unwrap();
 
-    Ok(SliceRequests::new(individual_slice_requests))
+    SliceRequests::new(individual_slice_requests)
 }
 
-fn slice_guide(slice_requests: SliceRequests) -> Result<(), Box<dyn Error>> {
-    let document = Document::load("./inputs/npch_guide.pdf")?;
+fn slice_guide(slice_requests: SliceRequests) {
+    let document = Document::load("./inputs/npch_guide.pdf").unwrap();
 
     let all_pages = document
         .get_pages()
@@ -130,7 +134,8 @@ fn slice_guide(slice_requests: SliceRequests) -> Result<(), Box<dyn Error>> {
     //     .copied()
     //     .collect::<BTreeSet<u32>>();
 
-    std::fs::create_dir_all("./outputs/")?;
+    std::fs::create_dir_all("./outputs/unoptimized/").unwrap();
+    std::fs::create_dir_all("./outputs/optimized/").unwrap();
 
     for slice_request in slice_requests.iter() {
         let required_deletions = all_pages
@@ -140,13 +145,47 @@ fn slice_guide(slice_requests: SliceRequests) -> Result<(), Box<dyn Error>> {
         let mut slice_pdf = document.clone();
         slice_pdf.delete_pages(&required_deletions);
         slice_pdf.prune_objects();
-        slice_pdf.save(format!("./outputs/{}.pdf", slice_request.description))?;
-    }
+        slice_pdf
+            .save(format!(
+                "./outputs/unoptimized/{}.pdf",
+                slice_request.description
+            ))
+            .unwrap();
 
-    Ok(())
+        shrink(&slice_request.description);
+    }
+}
+
+fn shrink(pdf_name: &str) {
+    let input_path = PathBuf::from(format!("./outputs/unoptimized/{pdf_name}.pdf"));
+    let pre_shrink_size = input_path.metadata().unwrap().len() as f32;
+
+    let output_path = PathBuf::from(format!("./outputs/optimized/{pdf_name}.pdf"));
+    let image_resolution = 60;
+    Command::new("gswin64")
+        .arg("-dBATCH")
+        .arg("-dNOPAUSE")
+        .arg("-q")
+        .arg("-dCompatibilityLevel=1.4")
+        .arg("-dPDFSETTINGS=/screen")
+        .arg(format!("-r{image_resolution}"))
+        .arg("-sDEVICE=pdfwrite")
+        .arg(format!("-sOutputFile={}", output_path.display()))
+        .arg(&input_path)
+        .output()
+        .unwrap();
+
+    let post_shrink_size = output_path.metadata().unwrap().len() as f32;
+
+    println!(
+        "Shrunk {}: {:.2}MB -> {:.2}MB",
+        pdf_name,
+        pre_shrink_size / 1e6,
+        post_shrink_size / 1e6,
+    );
 }
 
 fn main() {
-    let slice_requests = slice().unwrap();
-    slice_guide(slice_requests).unwrap();
+    let slice_requests = slice();
+    slice_guide(slice_requests);
 }
