@@ -6,5 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-csv = "1.1.6"
-lopdf = "0.29.0"
+csv = "1.1"
+lopdf = "0.29"
+serde = {version = "1.0", features = ["derive"]}
+thiserror = "1.0.38"
