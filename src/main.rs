@@ -139,6 +139,7 @@ fn slice_guide(slice_requests: SliceRequests) -> Result<(), Box<dyn Error>> {
             .collect::<Vec<u32>>();
         let mut slice_pdf = document.clone();
         slice_pdf.delete_pages(&required_deletions);
+        slice_pdf.prune_objects();
         slice_pdf.save(format!("./outputs/{}.pdf", slice_request.description))?;
     }
 
